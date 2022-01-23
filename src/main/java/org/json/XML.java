@@ -523,6 +523,7 @@ public class XML {
             x.skipPast(token + ">"); // Skip past to the end of the closed tag
             return false;
         }
+
         // <!
 
         if (token == BANG) {
