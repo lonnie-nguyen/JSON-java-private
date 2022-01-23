@@ -41,13 +41,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1068,5 +1062,60 @@ public class XMLTest {
             });
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
+    }
+
+
+    /**
+     * Should return correct SubObject from the overloaded toJSONObject function
+     */
+    @Test
+    public void shouldReturnCorrectSubObject() {
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+
+        JSONPointer jsp = new JSONPointer("/addresses/address/street");
+        JSONObject jsonObject = XML.toJSONObject(xmlR, jsp);
+
+        String expectedStr = "{\"street\":\"Baker "+
+                "street 5\",\"name\":\"Joe Tester\"}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    /**
+     * Should replace correct subobject from the overloaded toJSONObject function
+     */
+    @Test
+    public void shouldReplaceCorrectSubObject() {
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        String replacementObj = "{\"name\":\"Something Replaced\"}";
+        JSONObject replacementJSON = new JSONObject(replacementObj);
+
+        Reader xmlR = new StringReader(xmlStr);
+
+        JSONPointer jsp = new JSONPointer("/addresses/address");
+        JSONObject jsonObject = XML.toJSONObject(xmlR, jsp, replacementJSON);
+
+        String expectedStr = "{\"addresses\":{\"name\":\"Something Replaced\"}}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 }
