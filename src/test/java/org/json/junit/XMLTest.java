@@ -24,12 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -45,6 +39,8 @@ import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -1069,7 +1065,7 @@ public class XMLTest {
      * Should return correct SubObject from the overloaded toJSONObject function
      */
     @Test
-    public void shouldReturnCorrectSubObject() {
+    public void shouldReturnCorrectSubObject() throws Exception {
 
         String xmlStr =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -1095,7 +1091,7 @@ public class XMLTest {
      * Should replace correct subobject from the overloaded toJSONObject function
      */
     @Test
-    public void shouldReplaceCorrectSubObject() {
+    public void shouldReplaceCorrectSubObject() throws Exception {
 
         String xmlStr =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -1117,5 +1113,62 @@ public class XMLTest {
         String expectedStr = "{\"addresses\":{\"name\":\"Something Replaced\"}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    /**
+     * Should throw exception if path is empty or null when overloaded method is called
+     */
+    @Test
+    public void shouldThrowExceptionOnEmptyPathOverloadedOne() throws Exception {
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+
+        Throwable exception = assertThrows(
+                Exception.class, () -> {
+                    JSONPointer jsp = new JSONPointer("");
+                    XML.toJSONObject(xmlR, jsp);
+                }
+        );
+
+        assertEquals("Path cannot be null or empty", exception.getMessage());
+    }
+
+    /**
+     * Should throw exception if path is empty or null when overloaded method to
+     * replace sub-object is called
+     */
+    @Test
+    public void shouldThrowExceptionOnEmptyPathOverloadedTwo() throws Exception {
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+        String replacementObj = "{\"name\":\"Something Replaced\"}";
+        JSONObject replacementJSON = new JSONObject(replacementObj);
+
+        Throwable exception = assertThrows(
+                Exception.class, () -> {
+                    JSONPointer jsp = new JSONPointer("");
+                    XML.toJSONObject(xmlR, jsp, replacementJSON);
+                }
+        );
+
+        assertEquals("Path cannot be null or empty", exception.getMessage());
     }
 }

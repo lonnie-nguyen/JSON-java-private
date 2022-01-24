@@ -887,7 +887,10 @@ public class XML {
      * @return A JSONObject containing the specified sub-object.
      * @throws JSONException Thrown if there is an errors while parsing the string.
      */
-    public static JSONObject toJSONObject(Reader reader, JSONPointer path) throws JSONException {
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path) throws JSONException, Exception {
+        if (path.toString() == null || path.toString().length() == 0) {
+            throw new Exception("Path cannot be null or empty");
+        }
         String strPath = path.toString();
         String[] keys = strPath.substring(1).split("/");
         String nameOfObj = keys[keys.length - 1];
@@ -903,7 +906,10 @@ public class XML {
      * @return A JSONObject with the replacement object.
      * @throws JSONException Thrown if there is an errors while parsing the string.
      */
-    public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement) throws JSONException {
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement) throws JSONException, Exception {
+        if (path.toString() == null || path.toString().length() == 0) {
+            throw new Exception("Path cannot be null or empty");
+        }
         String strPath = path.toString();
         return toJSONObject(reader, XMLParserConfiguration.ORIGINAL, strPath, replacement);
     }
