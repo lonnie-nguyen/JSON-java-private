@@ -10,3 +10,9 @@ Two to check a valid output for a valid input
 Two additional ones for added to check if an empty or null path has been added by user
 We could have further added one to check for a wrong path, but after discussion with the TA, decided to assume that a 
 correct path will be given.
+To run the tests, we used the IDE IntelliJ 
+Test methods that have been added have the signature:
+shouldReturnCorrectSubObject
+shouldReplaceCorrectSubObject
+shouldThrowExceptionOnEmptyPathOverloadedOne
+shouldThrowExceptionOnEmptyPathOverloadedTwo
