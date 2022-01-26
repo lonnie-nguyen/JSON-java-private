@@ -693,9 +693,12 @@ public class XML {
                                         context.accumulate(tagName, jsonObject);
                                     }
                                 }
-                                // Task 1: After calling context.accumulate()... check if context key matches what we want in our path
+                                // Task 1: After calling context.accumulate()...
+                                // check if context key matches what we want in our path
                                 if (context.has(key) && replace == null) {
-                                    if (tagName.equals(key) && !jsonObject.has("content")) { //!
+                                    // Use tagName and jsonObject to create sub-object instead of context
+                                    // in case context has accumulated content that we do not want
+                                    if (tagName.equals(key) && !jsonObject.has("content")) {
                                         Map<String, Object> m = jsonObject.toMap();
                                         globalXMLtoJSONObj.put(key, m);
                                         throw new JSONException("Done parsing XML. Produced sub-JSONObject. ");
