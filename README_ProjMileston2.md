@@ -1,6 +1,6 @@
 # SWE262P Project
 **COLLABORATORS: LONNIE NGUYEN & TAHA ZIA**
-***
+
 ## Milestone 2
 ### Summary:
 Two overloaded methods have been added as asked with the signatures:
