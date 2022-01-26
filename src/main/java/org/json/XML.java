@@ -496,7 +496,7 @@ public class XML {
 
         token = x.nextToken(); // Get the next XML Token.
 
-        // Task 2
+        // Task 2: Create another XMLTokener to process the replacement XML obtained from replace
         // Extract keys from String key
         String[] keys = key.substring(1).split("/");
         String k = "";
@@ -509,16 +509,18 @@ public class XML {
         }
 
         if (token.equals(k)) {
-            // Create new XMLTokener
             String replaceXML = toString(replace);
             Reader reader = new StringReader(replaceXML);
             XMLTokener z = new XMLTokener(reader);
+            // While x has not advanced, use z to scan the replacement's
+            // content(s), attaching it to context
             while (z.more()) {
                 z.skipPast("<");
                 if (z.more()) {
                     parse1(z, context, name, config, k, new JSONObject());
                 }
             }
+            // Advance x forward to skip past the original XML content we replaced
             x.nextToken(); //  Consume '>'
             x.skipPast(token + ">"); // Skip past to the end of the closed tag
             return false;
@@ -915,7 +917,7 @@ public class XML {
     }
 
     /**
-     * Helper function for methods 1 and 2. It uses the parse1 function.
+     * Helper method for methods 1 and 2. It uses the parse1 function.
      * @param reader The XML source reader.
      * @param config Configuration options for the parser.
      * @param key A JSONObject containing the structured data from the XML string.
