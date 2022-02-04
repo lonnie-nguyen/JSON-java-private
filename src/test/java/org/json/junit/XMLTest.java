@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.json.*;
 import org.junit.Rule;
@@ -1170,5 +1171,24 @@ public class XMLTest {
         );
 
         assertEquals("Path cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    public void checkKeyReplacement() throws Exception {
+        Function<String, String> changeKey = s -> "swe262_"+s;
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+
+        XML.toJSONObject(xmlR, changeKey);
+
     }
 }
