@@ -1187,8 +1187,12 @@ public class XMLTest {
                         "</addresses>";
 
         Reader xmlR = new StringReader(xmlStr);
+        JSONObject jObj = XML.toJSONObject(xmlR, changeKey);
 
-        XML.toJSONObject(xmlR, changeKey);
+        String expectedStr = "{\"swe262_addresses\":{\"swe262_address\":{\"swe262_street\":\"Baker street 5\",\"swe262_name\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jObj, expectedObject);
 
     }
 }

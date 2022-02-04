@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 
@@ -801,11 +802,12 @@ public class XML {
             // Close tag </
 
             token = x.nextToken();
+            String tagMatch = keyTransformer.apply(token.toString());
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }
-            if (!token.equals(name)) {
-                throw x.syntaxError("Mismatched " + name + " and " + token);
+            if (!tagMatch.equals(name)) {
+                throw x.syntaxError("Mismatched " + name + " and " + tagMatch);
             }
             if (x.nextToken() != GT) {
                 throw x.syntaxError("Misshaped close tag");
@@ -861,22 +863,22 @@ public class XML {
                     if (x.nextToken() != GT) {
                         throw x.syntaxError("Misshaped tag");
                     }
-                    if (config.getForceList().contains(tagName)) {
+                    if (config.getForceList().contains(keyTransformer.apply(tagName))) {
                         // Force the value to be an array
                         if (nilAttributeFound) {
-                            context.append(tagName, JSONObject.NULL);
+                            context.append(keyTransformer.apply(tagName), JSONObject.NULL);
                         } else if (jsonObject.length() > 0) {
-                            context.append(tagName, jsonObject);
+                            context.append(keyTransformer.apply(tagName), jsonObject);
                         } else {
-                            context.put(tagName, new JSONArray());
+                            context.put(keyTransformer.apply(tagName), new JSONArray());
                         }
                     } else {
                         if (nilAttributeFound) {
-                            context.accumulate(tagName, JSONObject.NULL);
+                            context.accumulate(keyTransformer.apply(tagName), JSONObject.NULL);
                         } else if (jsonObject.length() > 0) {
-                            context.accumulate(tagName, jsonObject);
+                            context.accumulate(keyTransformer.apply(tagName), jsonObject);
                         } else {
-                            context.accumulate(tagName, "");
+                            context.accumulate(keyTransformer.apply(tagName), "");
                         }
                     }
                     return false;
@@ -904,25 +906,25 @@ public class XML {
 
                         } else if (token == LT) {
                             // Nested element
-                            if (parse(x, jsonObject, tagName, config)) {
-                                if (config.getForceList().contains(tagName)) {
+                            if (parse2(x, jsonObject, keyTransformer.apply(tagName), config, keyTransformer)) {
+                                if (config.getForceList().contains(keyTransformer.apply(tagName))) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
-                                        context.put(tagName, new JSONArray());
+                                        context.put(keyTransformer.apply(tagName), new JSONArray());
                                     } else if (jsonObject.length() == 1
                                             && jsonObject.opt(config.getcDataTagName()) != null) {
-                                        context.append(tagName, jsonObject.opt(config.getcDataTagName()));
+                                        context.append(keyTransformer.apply(tagName), jsonObject.opt(config.getcDataTagName()));
                                     } else {
-                                        context.append(tagName, jsonObject);
+                                        context.append(keyTransformer.apply(tagName), jsonObject);
                                     }
                                 } else {
                                     if (jsonObject.length() == 0) {
-                                        context.accumulate(tagName, "");
+                                        context.accumulate(keyTransformer.apply(tagName), "");
                                     } else if (jsonObject.length() == 1
                                             && jsonObject.opt(config.getcDataTagName()) != null) {
-                                        context.accumulate(tagName, jsonObject.opt(config.getcDataTagName()));
+                                        context.accumulate(keyTransformer.apply(tagName), jsonObject.opt(config.getcDataTagName()));
                                     } else {
-                                        context.accumulate(tagName, jsonObject);
+                                        context.accumulate(keyTransformer.apply(tagName), jsonObject);
                                     }
                                 }
 
