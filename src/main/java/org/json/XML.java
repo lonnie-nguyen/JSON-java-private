@@ -832,6 +832,7 @@ public class XML {
                 // attribute = value
                 if (token instanceof String) {
                     string = (String) token;
+                    string = keyTransformer.apply(string); // Transform string before accumulate()
                     token = x.nextToken();
                     if (token == EQ) {
                         token = x.nextToken();
@@ -1169,8 +1170,7 @@ public class XML {
                     parse1(x, jo, null, config, key, jobj);
             }
             return jo;
-        }
-        catch (JSONException ignore) {
+        } catch (JSONException ignore) {
             System.out.println(ignore.getMessage());
             // Caught exception, return JSONObject clone before exception was thrown
             return globalXMLtoJSONObj;
