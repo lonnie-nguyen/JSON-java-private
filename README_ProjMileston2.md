@@ -61,20 +61,25 @@ The unit test compares the actual JSONObject output against the expected JSONObj
   implementation effort (user implemented recursion, multiple events of parsing the information, multiple 
   JSONObject creations).
 - This implementation works with JSONArrays.
-- Currently, key transformation is not successful on "content" keys added to the JSONObject by the library. 
+- For large XML files, key transformation is not successful on "content" keys added to the JSONObject by the library.
+  (Refer to XML.java lines 903 - 904.)
   - This occurs when the original XML has an element with one or more attribute names and corresponding
   attribute values. 
   - The library handles this situation by treating each element and attribute as a key in the final JSONObject.
   - The side effect is the content between the element tags is left without its own key, so here the library keeps the assigned
   key of "content." 
   - The library uses JSONObject jsonObject as a building block. 
-    - The dummy key name of "content" is given to every jsonObject, which is usually overwritten when context calls accumulate
+    - The CDATA Tag Name of "content" is given to the jsonObject, which is usually overwritten when context calls accumulate
     to join the correct key and value pair within the JSONObject.
     >Example:
     > 
-    >```<Element attribute_name1="attribute value 1"...>Content</ Element>```
+    >```<Element attribute_name1="attribute value 1"...>Content</Element>```
     > 
     >```{"Element": {"attribute_name1": "attribute value 1", ..., "content": "Content"}}```
+  - In line 903, an attempt was made to replace the string "content" returned from ```config.getcDataTagName()``` with its 
+  transformed string. For small files this succeeded. Larger files of 1.46GB resulted in OutOfMemoryError.
+    - The code in lines 903 - 904 are original to the code and have not been altered by the contributors for submission of 
+    Milestone 3.
 
   
 
