@@ -46,10 +46,16 @@ One overloaded method has been added with the signature:
 
 The method can be found in src/main/java/XML.java
 
-To test the method, a JUnit test has been added in XMLTest with the signature:
+To test the method, three JUnit tests have been added in XMLTest with the signatures:
 > checkKeyReplacement
+> 
+> checkKeyReplacementReverseTransformation
+> 
+> checkKeyReplacementUpperCaseTransformation
 
-The unit test compares the actual JSONObject output against the expected JSONObject and determines if they are equal.
+The unit tests compares the actual JSONObject output against the expected JSONObject and passes if both objects are equal.
+Each unit test checks a different type of string transformation: adding a prefix to keys, reversing keys, and changing
+the case of keys to uppercase.
 
 ### Notes Concerning Milestone 3:
 - The overloaded method successfully processes XML files up to 1.46BG in size.
@@ -79,7 +85,8 @@ The unit test compares the actual JSONObject output against the expected JSONObj
   - In line 903, an attempt was made to replace the string "content" returned from ```config.getcDataTagName()``` with its 
   transformed string. For small files this succeeded. Larger files of 1.46GB resulted in OutOfMemoryError.
     - The code in lines 903 - 904 are original to the code and have not been altered by the contributors for submission of 
-    Milestone 3.
+    Milestone 3 in order to maintain support for large files.
+    - All original keys of the XML are transformed.
 
   
 
