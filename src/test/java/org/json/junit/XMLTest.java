@@ -1193,6 +1193,53 @@ public class XMLTest {
         JSONObject expectedObject = new JSONObject(expectedStr);
 
         Util.compareActualVsExpectedJsonObjects(jObj, expectedObject);
+    }
 
+    @Test
+    public void checkKeyReplacementReverseTransformation() throws Exception {
+        Function<String, String> changeKey = s -> {
+        StringBuilder sb = new StringBuilder();
+        sb.append(s);
+        return sb.reverse().toString();
+        };
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+        JSONObject jObj = XML.toJSONObject(xmlR, changeKey);
+
+        String expectedStr = "{\"sesserdda\":{\"sserdda\":{\"teerts\":\"Baker street 5\",\"eman\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jObj, expectedObject);
+    }
+
+    @Test
+    public void checkKeyReplacementUpperCaseTransformation() throws Exception {
+        Function<String, String> changeKey = s -> s.toUpperCase();
+
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Reader xmlR = new StringReader(xmlStr);
+        JSONObject jObj = XML.toJSONObject(xmlR, changeKey);
+
+        String expectedStr = "{\"ADDRESSES\":{\"ADDRESS\":{\"STREET\":\"Baker street 5\",\"NAME\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jObj, expectedObject);
     }
 }
