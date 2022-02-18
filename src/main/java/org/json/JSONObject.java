@@ -48,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -714,6 +715,25 @@ public class JSONObject {
         } catch (Exception e) {
             throw wrongValueFormatException(key, "float", e);
         }
+    }
+
+    /**
+     * Returns a stream of JSONObject.
+     *
+     * @return JSONObject Stream.
+     */
+    public Stream<JSONObject> toStream() {
+        Iterator<String> keys = this.keys();
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (this.get(key) instanceof JSONObject) {
+                return Stream.concat(Stream.of(this), Stream.of(this.getJSONObject(key)));
+            }
+            //ADD ARRAY CHECK HERE
+        }
+
+        return Stream.of(this);
     }
 
     /**
@@ -2723,3 +2743,4 @@ public class JSONObject {
         );
     }
 }
+
