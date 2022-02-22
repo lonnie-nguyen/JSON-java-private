@@ -2,10 +2,13 @@
 COLLABORATORS: LONNIE NGUYEN & TAHA ZIA
 ## Milestone 2
 ### Summary:
-Two overloaded methods have been added with the signatures:
-> 1) static JSONObject toJSONObject(Reader reader, JSONPointer path) 
-> 2) static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement)
-
+Two overloaded methods have been added with the method declarations:
+```java
+static JSONObject toJSONObject(Reader reader, JSONPointer path)
+``` 
+```java
+static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement)
+```
 These can be found in src/main/java/XML.java
 
 To test both methods, four JUnit tests have been added in XMLTest:
@@ -19,20 +22,20 @@ correct path will be given.
 
 To run the tests, we used the IDE [IntelliJ](https://www.jetbrains.com/help/idea/performing-tests.html) 
 Test methods that have been added have the signature:
-> shouldReturnCorrectSubObject
+> shouldReturnCorrectSubObject()
 > 
-> shouldReplaceCorrectSubObject
+> shouldReplaceCorrectSubObject()
 > 
-> shouldThrowExceptionOnEmptyPathOverloadedOne
+> shouldThrowExceptionOnEmptyPathOverloadedOne()
 > 
-> shouldThrowExceptionOnEmptyPathOverloadedTwo
+> shouldThrowExceptionOnEmptyPathOverloadedTwo()
 
 ### Notes Concerning Milestone 2:
 - Both overloaded methods successfully process XML files up to 1.46GB in size.
 - By implementing method two in the library, there is a slight performance gain. We are creating the one 
 JSONObject that contains the replacement in one go. Otherwise, outside the library we are creating the
 original JSONObject, the replacement JSONObject, and then parsing the original to replace it with the replacement.
-- An additional helper method was added to facilitate processing: 
+- An additional helper method, with the following signature, was added to facilitate processing: 
   > toJSONObject(Reader, XMLParserConfiguration, String, JSONObject)
 - The implementations are not designed to handle instances with arrays.
 - To handle the overloaded methods, a separate parse method was implemented with the signature:
@@ -41,17 +44,18 @@ original JSONObject, the replacement JSONObject, and then parsing the original t
 
 ## Milestone 3
 ### Summary:
-One overloaded method has been added with the signature:
-> static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) 
-
+One overloaded method has been added with the method declaration:
+```java
+static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) 
+```
 The method can be found in src/main/java/XML.java
 
 To test the method, three JUnit tests have been added in XMLTest with the signatures:
-> checkKeyReplacement
+> checkKeyReplacement()
 > 
-> checkKeyReplacementReverseTransformation
+> checkKeyReplacementReverseTransformation()
 > 
-> checkKeyReplacementUpperCaseTransformation
+> checkKeyReplacementUpperCaseTransformation()
 
 The unit tests compares the actual JSONObject output against the expected JSONObject and passes if both objects are equal.
 Each unit test checks a different type of string transformation: adding a prefix to keys, reversing keys, and changing
@@ -60,6 +64,11 @@ the case of keys to uppercase.
 ### Notes Concerning Milestone 3:
 - The overloaded method successfully processes XML files up to 1.46BG in size.
 - The key transformation is occurring during the parsing of the XML file.
+- A third parse method was implemented with the method declaration:
+```java
+private static boolean parse2(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, 
+        Function<String, String> keyTransformer) throws JSONException
+```
 - Regarding performance:
   - Implementing key transformation inside the library allows for performance gains when concerning resources, time, and
   effort. The XML file is parsed once and the desired JSONObject is created.
@@ -81,7 +90,7 @@ the case of keys to uppercase.
     > 
     >```<Element attribute_name1="attribute value 1"...>Content</Element>```
     > 
-    >```{"Element": {"attribute_name1": "attribute value 1", ..., "content": "Content"}}```
+    >```{"Element":{"attribute_name1":"attribute value 1",...,"content":"Content"}}```
   - In line 903, an attempt was made to replace the string "content" returned from ```config.getcDataTagName()``` with its 
   transformed string. For small files this succeeded. Larger files of 1.46GB resulted in OutOfMemoryError.
     - The code in lines 903 - 904 are original to the code and have not been altered by the contributors for submission of 
@@ -91,17 +100,19 @@ the case of keys to uppercase.
 ## Milestone 4
 ### Summary:
 
-One method with the signature **toStream** has been added to the file src/main/java/JSONObject.
-
+One method has been added to the file src/main/java/JSONObject with the method declaration:
+```java
+public Stream<JSONObject> toStream()
+```
 This method uses the spliterator to traverse and stream JSONObject nodes as they are encountered.
 - A **spliterator** method was added, which returns a JSONObjectSpliterator of the passed in JSONObject.
-- The class **JSONObjectSpliterator**, which implements Spliterator<JSONObject>, was also added.
+- The inner class **JSONObjectSpliterator**, which implements Spliterator<JSONObject>, was also added.
 - The method **tryAdvance** under the class **JSONObjectSpliterator** contains the logic to traverse the
 JSONObject's elements.
 
 To test the methods, a JUnit test has been added to JSONObjectTest:
 
->testToStreamFilterMapCollect
+>testToStreamFilterMapCollect()
 
 The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
 the stream library in java.
@@ -109,7 +120,28 @@ the stream library in java.
 ### Notes Concerning Milestone 4:
 - Large XML/JSON files can be streamed when filtering, but will result in an OutOfMemoryError if attempts are
 made to stream the entire file as output to console or a new file.
-
-
-  
-
+- For this milestone, a "node" is considered to be a JSONObject. This is including any JSONObjects nested within the original
+JSONObject (think nesting dolls). Defining a node in this way simplifies the streaming process and prevents unnecessary creation of 
+JSONObjects that would be used only for streaming to the client output.
+  >Example:
+  > 
+  > The following JSONObject has 2 nodes.
+  > 
+  >```{"Element":{"attribute_name":"attribute value","content":"Content"}}``` 
+  > 
+  >```{"attribute_name":"attribute value","content":"Content"}```
+- It is assumed that users of the toStream method will be familiar with the package 
+[java.util.stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html) and have experience 
+using methods of the [stream interface](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html).
+- A usage example for this method would be to retrieve **only** the driving directions from a JSON file (ex. route.json) 
+  obtained through MapQuest.
+    - Driving directions are identified by the key "narrative" where the value of "narrative" is a String. The String represents
+  a direction sentence. 
+    - Manually retrieving the first direction is cumbersome as it requires traversal along the 
+  following path: /route/legs/0/maneuvers/0/narrative. Getting all the directions requires this to be repeated for the 
+  entire JSONArray maneuvers. The toStream() method can do all of this in by chaining methods of the stream API:
+  ```java
+  route.toStream()
+        .filter(node -> node.has("narrative"))
+        .forEach(node -> System.out.println(node.get("narrative")));
+  ```
