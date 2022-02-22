@@ -79,9 +79,9 @@ the case of keys to uppercase.
     to join the correct key and value pair within the JSONObject.
     >Example:
     > 
-    ><Element attribute_name1="attribute value 1"...>Content</Element>
+    >```<Element attribute_name1="attribute value 1"...>Content</Element>```
     > 
-    >{"Element": {"attribute_name1": "attribute value 1", ..., "content": "Content"}}
+    >```{"Element": {"attribute_name1": "attribute value 1", ..., "content": "Content"}}```
   - In line 903, an attempt was made to replace the string "content" returned from ```config.getcDataTagName()``` with its 
   transformed string. For small files this succeeded. Larger files of 1.46GB resulted in OutOfMemoryError.
     - The code in lines 903 - 904 are original to the code and have not been altered by the contributors for submission of 
