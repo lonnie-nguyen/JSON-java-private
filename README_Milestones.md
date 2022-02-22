@@ -139,7 +139,8 @@ using methods of the [stream interface](https://docs.oracle.com/javase/8/docs/ap
   a direction sentence. 
     - Manually retrieving the first direction is cumbersome as it requires traversal along the 
   following path: /route/legs/0/maneuvers/0/narrative. Getting all the directions requires this to be repeated for the 
-  entire JSONArray maneuvers. The toStream() method can do all of this in by chaining methods of the stream API:
+  entire JSONArray maneuvers. The toStream() method can do all of this by chaining methods of the stream API into one 
+  line of code. Example shown below is broken down to show the different chained methods:
   ```java
   route.toStream()
         .filter(node -> node.has("narrative"))
