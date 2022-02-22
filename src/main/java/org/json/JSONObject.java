@@ -36,19 +36,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -718,10 +711,12 @@ public class JSONObject {
     }
 
     /**
-     * Returns a stream of JSONObject.
+     * Returns a stream of JSONObject. The method allows the client code to chain operations on JSONObject nodes.
+     * The JSONObjects flow in small parts to the next operation.
      *
      * @return JSONObject Stream.
      */
+    /*
     public Stream<JSONObject> toStream() {
         Iterator<String> keys = this.keys();
 
@@ -734,6 +729,66 @@ public class JSONObject {
         }
 
         return Stream.of(this);
+    }
+     */
+    public Stream<JSONObject> toStream() {
+        return StreamSupport.stream(this.spliterator(), false);
+    }
+
+    public Spliterator<JSONObject> spliterator() {
+        return new JSONObjectSpliterator(this);
+    }
+
+    public static class JSONObjectSpliterator implements Spliterator<JSONObject> {
+        private final JSONObject root;
+        private JSONObject tree;
+
+        JSONObjectSpliterator(JSONObject t) {
+            root = tree = t;
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super JSONObject> action) {
+            JSONObject current = tree;
+            action.accept(current);
+            Iterator<String> iterKeys = current.keys();
+            while (iterKeys.hasNext()) {
+                String key = iterKeys.next();
+                Object value = current.get(key);
+                if (value instanceof JSONObject) {
+                    tree = (JSONObject) value;
+                    tryAdvance(action);
+                }
+                else if (value instanceof JSONArray) {
+                    JSONArray ja = (JSONArray) value;
+                    for (int i = 0; i < ja.length(); i++) {
+                        Object value1 = ja.get(i);
+                        if (value1 instanceof JSONObject) {
+                            tree = (JSONObject) value1;
+                            tryAdvance(action);
+                        }
+                    }
+                }
+                tree = current;
+            }
+            tree = current;
+            return false;
+        }
+
+        @Override
+        public Spliterator<JSONObject> trySplit() {
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        public int characteristics() {
+            return Spliterator.IMMUTABLE | Spliterator.NONNULL;
+        }
     }
 
     /**
