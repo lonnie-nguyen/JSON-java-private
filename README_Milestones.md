@@ -100,6 +100,7 @@ This method uses the spliterator to traverse and stream JSONObject nodes as they
 JSONObject's elements.
 
 To test the methods, a JUnit test has been added to JSONObjectTest:
+
 >testToStreamFilterMapCollect
 
 The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
