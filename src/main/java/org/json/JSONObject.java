@@ -769,9 +769,7 @@ public class JSONObject {
                         }
                     }
                 }
-                tree = current;
             }
-            tree = current;
             return false;
         }
 

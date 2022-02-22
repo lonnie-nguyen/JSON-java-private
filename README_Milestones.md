@@ -88,5 +88,19 @@ the case of keys to uppercase.
     Milestone 3 in order to maintain support for large files.
     - All original keys of the XML are transformed.
 
+
+##Milestone 4
+###Summary
+One method with the signature toStream has been added to the file src/main/java/JSONObject
+
+This method uses the spliterator to traverse and stream JSONObject nodes as they are encountered
+
+To test the methods, a JUnit test has been added to JSONObjectTest:
+>testToStreamFilterMapCollect
+
+The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
+the stream library in java.
+
+
   
 
