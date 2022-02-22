@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.json.CDL;
 import org.json.JSONArray;
@@ -3352,6 +3353,9 @@ public class JSONObjectTest {
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
 
+    /**
+     * Tests for toStream() method
+     */
     @Test
     public void testToStreamJSON() {
         JSONObject jsonObj = new JSONObject();
@@ -3377,5 +3381,37 @@ public class JSONObjectTest {
 
         JSONObject myNewObj = new JSONObject(expectedStr);
         myNewObj.toStream().forEach(node -> System.out.println(node));
+    }
+
+    @Test
+    public void testToStreamFilterMapCollect() {
+        String xmlString = "<?xml version=\"1.0\"?>\n" +
+                "<catalog>\n" +
+                "   <book id=\"bk101\">\n" +
+                "      <author>Gambardella, Matthew</author>\n" +
+                "      <title>XML Developer's Guide</title>\n" +
+                "      <genre>Computer</genre>\n" +
+                "      <price>44.95</price>\n" +
+                "      <publish_date>2000-10-01</publish_date>\n" +
+                "      <description>An in-depth look at creating applications with XML.</description>\n" +
+                "   </book>\n" +
+                "   <book id=\"bk102\">\n" +
+                "      <author>Ralls, Kim</author>\n" +
+                "      <title>Midnight Rain</title>\n" +
+                "      <genre>Fantasy</genre>\n" +
+                "      <price>5.95</price>\n" +
+                "      <publish_date>2000-12-16</publish_date>\n" +
+                "      <description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>\n" +
+                "   </book>\n"+
+                "</catalog>\n";
+        JSONObject obj = XML.toJSONObject(xmlString);
+        List<String> titles = obj.toStream()
+                .filter(node -> node.has("title"))
+                .map(node ->(String) node.get("title"))
+                .collect(Collectors.toList());
+        List<String> expectedTitles = new ArrayList<>();
+                expectedTitles.add("XML Developer's Guide");
+                expectedTitles.add("Midnight Rain");
+        assertEquals(expectedTitles, titles);
     }
 }
