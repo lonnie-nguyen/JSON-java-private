@@ -3353,36 +3353,9 @@ public class JSONObjectTest {
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
 
-    /**
-     * Tests for toStream() method
-     */
-    @Test
-    public void testToStreamJSON() {
-        JSONObject jsonObj = new JSONObject();
-        jsonObj.put("key1", "hello");
-        jsonObj.put("key2", "hell");
-        jsonObj.put("key3", "oooo");
-        jsonObj.put("key4", "test");
-
-        jsonObj.toStream().forEach(node -> System.out.println(node));
-
-        String expectedStr =
-                "{"+
-                        "\"trueKey\":true,"+
-                        "\"falseKey\":false,"+
-                        "\"arrayKey\":[0,1,2],"+
-                        "\"objectKey\":{"+
-                        "\"myKey1\":\"myVal1\","+
-                        "\"myKey2\":\"myVal2\","+
-                        "\"myKey3\":\"myVal3\","+
-                        "\"myKey4\":\"myVal4\""+
-                        "}"+
-                        "}";
-
-        JSONObject myNewObj = new JSONObject(expectedStr);
-        myNewObj.toStream().forEach(node -> System.out.println(node));
-    }
-
+/*
+    Test for toStream method
+ */
     @Test
     public void testToStreamFilterMapCollect() {
         String xmlString = "<?xml version=\"1.0\"?>\n" +
@@ -3412,6 +3385,7 @@ public class JSONObjectTest {
         List<String> expectedTitles = new ArrayList<>();
                 expectedTitles.add("XML Developer's Guide");
                 expectedTitles.add("Midnight Rain");
+
         assertEquals(expectedTitles, titles);
     }
 }
