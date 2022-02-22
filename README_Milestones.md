@@ -87,19 +87,27 @@ the case of keys to uppercase.
     - The code in lines 903 - 904 are original to the code and have not been altered by the contributors for submission of 
     Milestone 3 in order to maintain support for large files.
     - All original keys of the XML are transformed.
-
-
+    
 ##Milestone 4
 ###Summary
-One method with the signature toStream has been added to the file src/main/java/JSONObject
 
-This method uses the spliterator to traverse and stream JSONObject nodes as they are encountered
+One method with the signature **toStream** has been added to the file src/main/java/JSONObject.
+
+This method uses the spliterator to traverse and stream JSONObject nodes as they are encountered.
+- A **spliterator** method was added, which returns a JSONObjectSpliterator of the passed in JSONObject.
+- The class **JSONObjectSpliterator**, which implements Spliterator<JSONObject>, was also added.
+- The method **tryAdvance** under the class **JSONObjectSpliterator** contains the logic to traverse the
+JSONObject's elements.
 
 To test the methods, a JUnit test has been added to JSONObjectTest:
 >testToStreamFilterMapCollect
 
 The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
 the stream library in java.
+
+### Notes Concerning Milestone 4:
+- Large XML/JSON files can be streamed when filtering, but will result in an OutOfMemoryError if attempts are
+made to stream the entire file as output to console or a new file.
 
 
   
