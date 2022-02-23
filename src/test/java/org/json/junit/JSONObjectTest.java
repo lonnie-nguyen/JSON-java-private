@@ -3400,8 +3400,6 @@ public class JSONObjectTest {
         System.out.println(test);
         jo = null;
 
-        System.out.print(jo.toStream().collect(Collectors.toList()));
-
         assertTrue(test.get(0).isEmpty());
     }
 
