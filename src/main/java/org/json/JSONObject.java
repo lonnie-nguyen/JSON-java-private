@@ -716,37 +716,37 @@ public class JSONObject {
      *
      * @return JSONObject Stream.
      */
-    /*
-    public Stream<JSONObject> toStream() {
-        Iterator<String> keys = this.keys();
-
-        while (keys.hasNext()) {
-            String key = keys.next();
-            if (this.get(key) instanceof JSONObject) {
-                return Stream.concat(Stream.of(this), Stream.of(this.getJSONObject(key)));
-            }
-            //ADD ARRAY CHECK HERE
-        }
-
-        return Stream.of(this);
-    }
-     */
     public Stream<JSONObject> toStream() {
         return StreamSupport.stream(this.spliterator(), false);
     }
 
+    /**
+     * Spliterator method used to "spliterate" the JSONObject
+     * @return Spliterator of type JSONObject
+     */
     public Spliterator<JSONObject> spliterator() {
         return new JSONObjectSpliterator(this);
     }
 
+    /**
+     * Inner class which implements Spliterator of type JSONObject
+     */
     public static class JSONObjectSpliterator implements Spliterator<JSONObject> {
-        private final JSONObject root;
         private JSONObject tree;
 
+        /**
+         * Constructor
+         * @param t Pointer to the current "node"
+         */
         JSONObjectSpliterator(JSONObject t) {
-            root = tree = t;
+            tree = t;
         }
 
+        /**
+         * Method which yields the next element (JSONObject)
+         * @param action a Consumer which accepts one JSONObject into the stream
+         * @return false when there are more elements to traverse (false ends the traversal)
+         */
         @Override
         public boolean tryAdvance(Consumer<? super JSONObject> action) {
             JSONObject current = tree;
@@ -754,7 +754,8 @@ public class JSONObject {
             Iterator<String> iterKeys = current.keys();
             while (iterKeys.hasNext()) {
                 String key = iterKeys.next();
-                Object value = current.get(key);
+//                Object value = current.get(key);
+                Object value = current.opt(key); // Using existing library code
                 if (value instanceof JSONObject) {
                     tree = (JSONObject) value;
                     tryAdvance(action);
@@ -762,7 +763,8 @@ public class JSONObject {
                 else if (value instanceof JSONArray) {
                     JSONArray ja = (JSONArray) value;
                     for (int i = 0; i < ja.length(); i++) {
-                        Object value1 = ja.get(i);
+//                        Object value1 = ja.get(i);
+                        Object value1 = ja.opt(i); // Using existing library code
                         if (value1 instanceof JSONObject) {
                             tree = (JSONObject) value1;
                             tryAdvance(action);
@@ -773,16 +775,30 @@ public class JSONObject {
             return false;
         }
 
+        /**
+         * Stream is not processed in parallel this method is set to return null.
+         * @return null
+         */
         @Override
         public Spliterator<JSONObject> trySplit() {
             return null;
         }
 
+        /**
+         * To process JSONObjects passed into the stream of unknown size, this method
+         * returns Long.MAX_VALUE to handle any size.
+         * @return long max value
+         */
         @Override
         public long estimateSize() {
             return Long.MAX_VALUE;
         }
 
+        /**
+         * Method tells JVM what to do with the stream being produced. The streams will
+         * be immutable and nonnull.
+         * @return int number of characteristics
+         */
         @Override
         public int characteristics() {
             return Spliterator.IMMUTABLE | Spliterator.NONNULL;
