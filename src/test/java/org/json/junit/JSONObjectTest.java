@@ -3388,4 +3388,31 @@ public class JSONObjectTest {
 
         assertEquals(expectedTitles, titles);
     }
+
+    /*
+    *   Test to check toStream runs as expected for empty JSONObject
+     */
+    @Test
+    public void testToStreamEmptyJsonObject() {
+        JSONObject jo = new JSONObject();
+
+        List<JSONObject> test = jo.toStream().collect(Collectors.toList());
+        System.out.println(test);
+        jo = null;
+
+        System.out.print(jo.toStream().collect(Collectors.toList()));
+
+        assertTrue(test.get(0).isEmpty());
+    }
+
+    /*
+    *   Null JSON Object should return exception when trying toStream()
+     */
+    @Test(expected=NullPointerException.class)
+    public void testNullJsonObjectToStream() {
+        JSONObject jo = null;
+
+        jo.toStream().collect(Collectors.toList());
+        fail("Expected an exception");
+    }
 }

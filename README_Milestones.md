@@ -110,9 +110,13 @@ This method uses the spliterator to traverse and stream JSONObject nodes as they
 - The method **tryAdvance** under the class **JSONObjectSpliterator** contains the logic to traverse the
 JSONObject's elements.
 
-To test the methods, a JUnit test has been added to JSONObjectTest:
+To test the methods, three JUnit tests have been added to JSONObjectTest:
 
 >testToStreamFilterMapCollect()
+
+>testToStreamEmptyJsonObject()
+
+>testNullJsonObjectToStream()
 
 The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
 the stream library in java.
