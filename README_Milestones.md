@@ -2,14 +2,13 @@
 COLLABORATORS: LONNIE NGUYEN & TAHA ZIA
 ## Milestone 2
 ### Summary:
-Two overloaded methods have been added with the method declarations:
+Two overloaded methods have been added to src/main/java/XML with the method declarations:
 ```java
 static JSONObject toJSONObject(Reader reader, JSONPointer path)
 ``` 
 ```java
 static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement)
 ```
-These can be found in src/main/java/XML.java
 
 To test both methods, four JUnit tests have been added in XMLTest:
 
@@ -44,11 +43,10 @@ original JSONObject, the replacement JSONObject, and then parsing the original t
 
 ## Milestone 3
 ### Summary:
-One overloaded method has been added with the method declaration:
+One overloaded method has been added to src/main/java/XML with the method declaration:
 ```java
 static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) 
 ```
-The method can be found in src/main/java/XML.java
 
 To test the method, three JUnit tests have been added in XMLTest with the signatures:
 > checkKeyReplacement()
@@ -100,7 +98,7 @@ private static boolean parse2(XMLTokener x, JSONObject context, String name, XML
 ## Milestone 4
 ### Summary:
 
-One method has been added to the file src/main/java/JSONObject with the method declaration:
+One method has been added to src/main/java/JSONObject with the method declaration:
 ```java
 public Stream<JSONObject> toStream()
 ```
@@ -113,9 +111,9 @@ JSONObject's elements.
 To test the methods, three JUnit tests have been added to JSONObjectTest:
 
 >testToStreamFilterMapCollect()
-
+>
 >testToStreamEmptyJsonObject()
-
+>
 >testNullJsonObjectToStream()
 
 The test checks the capabilities of the json stream by using filter, map, and collect methods provided by
@@ -150,3 +148,43 @@ using methods of the [stream interface](https://docs.oracle.com/javase/8/docs/ap
         .filter(node -> node.has("narrative"))
         .forEach(node -> System.out.println(node.get("narrative")));
   ```
+## Milestone 5
+### Summary:
+
+Two asynchronous methods have been added to src/main/java/XML with the method declarations:
+```java
+public static void toJSONObject(Reader reader, Consumer<JSONObject> func, Consumer<Exception> exception)
+```
+```java
+public static CompletableFuture<JSONObject> toFutureJSONObject(Reader reader)
+```
+The first method toJSONObject:
+- Uses an explicitly created thread to execute its tasks.
+  - It first parses XML to JSONObject. 
+  - The same thread will process the JSONObject according to the Consumer function func passed in through the client. 
+    - The function func takes a JSONObject as a parameter and returns nothing. 
+  - If something goes wrong during this process, an exception will be handled according to the Consumer function
+  exception passed in as the last argument. 
+    - The function exception takes an Exception as a parameter and returns nothing.
+
+The second method toFutureJSONObject:
+- Uses a thread from the global ForkJoinPool.commonPool().
+  - Parses XML to JSONObject.
+  - Returns a CompletableFuture of type JSONObject, which can be retrieved on the client side with get() and used
+  accordingly.
+  
+To test the methods,
+
+>
+> 
+> 
+> 
+
+### Notes Concerning Milestone 5:
+- Both methods are capable of asynchronously processing files up to 1.46GB in size.
+- When writing large JSONObjects to file, using the method write(Reader r) will throw an OutOfMemoryError. To avoid this,
+use the write() method which allows for pretty print.
+- When comparing performance, both methods are on par with each other. The toFutureJSONObject finishes its task faster 
+because it is only parsing XML to JSONObject. While toJSONObject is creating a JSONObject and writing it to file.
+  - It can be argued that using CompletableFuture is better because it does not explicitly create a thread for its task,
+  making it less computationally expensive.
