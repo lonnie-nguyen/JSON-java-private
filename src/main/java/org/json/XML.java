@@ -32,6 +32,8 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -722,16 +724,14 @@ public class XML {
     }
 
     /**
-     * Scan the content following the named tag, attaching it to the context.
+     * Scan the content following the named tag, attaching it to the context. Method for use with
+     * overloaded method # 3 toJSONObject.
      *
-     * @param x
-     *            The XMLTokener containing the source string.
-     * @param context
-     *            The JSONObject that will include the new material.
-     * @param name
-     *            The tag name.
-     * @param keyTransformer
-     *            The function that transforms passed key
+     * @param x The XMLTokener containing the source string.
+     * @param context The JSONObject that will include the new material.
+     * @param name The tag name.
+     * @param config Configuration options for the parser.
+     * @param keyTransformer Function transformation for the string.
      * @return true if the close tag is processed.
      * @throws JSONException
      */
@@ -1141,7 +1141,7 @@ public class XML {
     }
 
     /**
-     * Overloaded method #3 toJSONObject.
+     * Overloaded method # 3 toJSONObject.
      * @param reader The XML source reader.
      * @param keyTransformer The function that transforms and returns updated key
      * @return A JSONObject with transformed keys
@@ -1149,6 +1149,39 @@ public class XML {
      */
     public static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) {
         return toJSONObject(reader, XMLParserConfiguration.ORIGINAL, keyTransformer);
+    }
+
+    /**
+     * Overloaded method # 4 toJSONObject for Milestone 5. Method is asynchronous as it uses its own
+     * thread separate from that of the main thread. Code in the main thread is allowed to proceed while
+     * the call to the method is processing.
+     * @param reader The XML source reader.
+     * @param func The Consumer function which should be performed when the JSONObject is ready.
+     * @param exception The Consumer function with the exception to be thrown.
+     */
+    public static void toJSONObject(Reader reader, Consumer<JSONObject> func, Consumer<Exception> exception) {
+        Thread t = new Thread(() -> {
+            JSONObject jo = toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
+            func.accept(jo);
+        });
+        t.start();
+        while (t.isAlive()) {
+            System.out.println("Thread is still processing...");
+        }
+        try {
+            t.join();
+        } catch (Exception e) {
+            exception.accept(e);
+        }
+    }
+
+    /**
+     * Same as method # 4 but returning a CompletableFuture.
+     * @param reader The XML source reader.
+     * @return CompletableFuture object of type JSONObject containing the structured data from the XML string.
+     */
+    public static CompletableFuture<JSONObject> toFutureJSONObject(Reader reader) {
+        return CompletableFuture.supplyAsync(() -> toJSONObject(reader, XMLParserConfiguration.ORIGINAL));
     }
 
     /**
