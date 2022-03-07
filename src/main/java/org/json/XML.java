@@ -1161,17 +1161,17 @@ public class XML {
      */
     public static void toJSONObject(Reader reader, Consumer<JSONObject> func, Consumer<Exception> exception) {
         Thread t = new Thread(() -> {
-            JSONObject jo = toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
+            JSONObject jo = new JSONObject();
+            try {
+                jo = toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
+            } catch (Exception e) {
+                exception.accept(e);
+            }
             func.accept(jo);
         });
         t.start();
         while (t.isAlive()) {
-            System.out.println("Thread is still processing...");
-        }
-        try {
-            t.join();
-        } catch (Exception e) {
-            exception.accept(e);
+            System.out.println(t.getName() + " is still processing...");
         }
     }
 
