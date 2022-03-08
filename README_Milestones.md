@@ -179,9 +179,12 @@ To test the methods, three JUnit tests have been added to XMLTest
 > 
 >testAsynchronousToJSONObjectWithSleep()
 > 
+>testAsynchronousToJSONObjectException()
+> 
 >testFuturesToJSONObject()
 
-These tests make sure the correct JSONObject is returned from the given XML. The first method uses the normal overloaded asynchronous method, whereas, the third test uses Futures to process the XML. In the second method, Thread.sleep has been added to test the asynchronous functionality. 
+These tests make sure the correct JSONObject is returned from the given XML. The first method uses the normal overloaded asynchronous method, whereas, the fourth test uses Futures to process the XML. In the second method, Thread.sleep has been added to test the asynchronous functionality.
+Finally, the third method tests to check whether an exception is thrown when a null XML and an invalid XMl is given.
 
 ### Notes Concerning Milestone 5:
 - Both methods are capable of asynchronously processing files up to 1.46GB in size.

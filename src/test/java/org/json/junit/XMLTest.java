@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.json.*;
@@ -1288,6 +1289,29 @@ public class XMLTest {
 
         JSONObject actualObject = new JSONObject(writer.toString());
         Util.compareActualVsExpectedJsonObjects(actualObject, expectedObject);
+    }
+
+    @Test
+    public void testAsynchronousToJSONObjectException() {
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "addresses\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        Writer writer = new StringWriter();
+
+        Reader xmlR = new StringReader(xmlStr);
+        AtomicReference<String> exception = new AtomicReference<>("");
+
+        XML.toJSONObject(xmlR, (JSONObject jo) -> jo.write(writer), e -> exception.set(e.getMessage()));
+        assertTrue(exception.get().contains("Mismatched close tag addresses"));
+
+        XML.toJSONObject(null, (JSONObject jo) -> jo.write(writer), e -> exception.set(e.getMessage()));
+        assertNull(exception.get());
     }
 
     @Test
