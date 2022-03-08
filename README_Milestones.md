@@ -173,12 +173,15 @@ The second method toFutureJSONObject:
   - Returns a CompletableFuture of type JSONObject, which can be retrieved on the client side with get() and used
   accordingly.
   
-To test the methods,
+To test the methods, three JUnit tests have been added to XMLTest
 
->
+>testAsynchronousToJSONObject()
 > 
+>testAsynchronousToJSONObjectWithSleep()
 > 
-> 
+>testFuturesToJSONObject()
+
+These tests make sure the correct JSONObject is returned from the given XML. The first method uses the normal overloaded asynchronous method, whereas, the third test uses Futures to process the XML. In the second method, Thread.sleep has been added to test the asynchronous functionality. 
 
 ### Notes Concerning Milestone 5:
 - Both methods are capable of asynchronously processing files up to 1.46GB in size.

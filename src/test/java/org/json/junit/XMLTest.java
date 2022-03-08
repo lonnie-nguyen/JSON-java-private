@@ -24,16 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.function.Function;
 
 import org.json.*;
@@ -1241,5 +1235,78 @@ public class XMLTest {
         JSONObject expectedObject = new JSONObject(expectedStr);
 
         Util.compareActualVsExpectedJsonObjects(jObj, expectedObject);
+    }
+
+    @Test
+    public void testAsynchronousToJSONObject() {
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\",\"name\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Writer writer = new StringWriter();
+
+        Reader xmlR = new StringReader(xmlStr);
+        XML.toJSONObject(xmlR, (JSONObject jo) -> jo.write(writer), Throwable::printStackTrace);
+
+        JSONObject actualObject = new JSONObject(writer.toString());
+        Util.compareActualVsExpectedJsonObjects(actualObject, expectedObject);
+    }
+
+    @Test
+    public void testAsynchronousToJSONObjectWithSleep() {
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\",\"name\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Writer writer = new StringWriter();
+
+        Reader xmlR = new StringReader(xmlStr);
+        XML.toJSONObject(xmlR, (JSONObject jo) -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            jo.write(writer);
+            }, Throwable::printStackTrace);
+
+        JSONObject actualObject = new JSONObject(writer.toString());
+        Util.compareActualVsExpectedJsonObjects(actualObject, expectedObject);
+    }
+
+    @Test
+    public void testFuturesToJSONObject() throws ExecutionException, InterruptedException {
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>Baker street 5</street>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\",\"name\":\"Joe Tester\"}}}";
+        JSONObject expectedObject = new JSONObject(expectedStr);
+
+        Reader xmlR = new StringReader(xmlStr);
+        CompletableFuture<JSONObject> actualObject = XML.toFutureJSONObject(xmlR);
+
+        Util.compareActualVsExpectedJsonObjects(actualObject.get(), expectedObject);
     }
 }
