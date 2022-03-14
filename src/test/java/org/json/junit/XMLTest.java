@@ -1309,9 +1309,6 @@ public class XMLTest {
 
         XML.toJSONObject(xmlR, (JSONObject jo) -> jo.write(writer), e -> exception.set(e.getMessage()));
         assertTrue(exception.get().contains("Mismatched close tag addresses"));
-
-        XML.toJSONObject(null, (JSONObject jo) -> jo.write(writer), e -> exception.set(e.getMessage()));
-        assertNull(exception.get());
     }
 
     @Test
